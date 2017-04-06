@@ -1,0 +1,276 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="https://github.com/data-uri/datauri#readme">datauri (v1.0.5)</a>
+</h1>
+<h4>Create DataURI scheme easily</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.datauri">module datauri</a><ol>
+
+        <li>
+
+            <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">datauri.</span>api</span>
+
+        </li>
+
+        <li>
+
+            <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">datauri.</span>css</span>
+
+        </li>
+
+        <li>
+
+            <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">datauri.</span>uri</span>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.datauri.api">module datauri.api</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.datauri.api.default">
+            function <span class="apidocSignatureSpan">datauri.api.</span>default
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.datauri.css">module datauri.css</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.datauri.css.default">
+            function <span class="apidocSignatureSpan">datauri.css.</span>default
+            <span class="apidocSignatureSpan">(data)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.datauri.uri">module datauri.uri</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.datauri.uri.default">
+            function <span class="apidocSignatureSpan">datauri.uri.</span>default
+            <span class="apidocSignatureSpan">{{signature}}</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.datauri" id="apidoc.module.datauri">module datauri</a></h1>
+
+
+
+
+
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.datauri.api" id="apidoc.module.datauri.api">module datauri.api</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.datauri.api.default" id="apidoc.element.datauri.api.default">
+        function <span class="apidocSignatureSpan">datauri.api.</span>default
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">class Api extends _stream2.default {
+  constructor() {
+    super();
+
+    this.readable = true;
+  }
+
+  format(fileName, fileContent) {
+    const fileBuffer = fileContent instanceof Buffer ? fileContent : new Buffer(fileContent);
+
+    this.base64 = fileBuffer.toString('base64');
+    this.createMetadata(fileName);
+
+    return this;
+  }
+
+  createMetadata(fileName) {
+    this.fileName = fileName;
+    this.mimetype = (0, _mimer2.default)(fileName);
+    const mimetype = this.mimetype;
+    var _base = this.base64;
+    const base64 = _base === undefined ? '' : _base;
+
+    this.content = (0, _uri2.default)({ mimetype, base64 });
+
+    return this;
+  }
+
+  runCallback(handler, err) {
+    if (err) {
+      return handler(err);
+    }
+
+    handler.call(this, null, this.content, this);
+  }
+
+  encode(fileName, handler) {
+    return this.async(fileName, err =&gt; handler &amp;&amp; this.runCallback(handler, err));
+  }
+
+  async(fileName, handler) {
+    const base64Chunks = [];
+    const propagateStream = chunk =&gt; this.emit('data', chunk);
+
+    propagateStream(this.createMetadata(fileName).content);
+    (0, _fs.createReadStream)(fileName, { encoding: 'base64' }).on('data', propagateStream).on('data', chunk =&gt; base64Chunks.push
+(chunk)).on('error', err =&gt; {
+      handler(err);
+      this.emit('error', err);
+    }).on('end', () =&gt; {
+      this.base64 = base64Chunks.join('');
+      this.emit('end');
+      handler.call(this.createMetadata(fileName));
+      this.emit('encoded', this.content, this);
+    });
+  }
+
+  encodeSync(fileName) {
+    if (!fileName || !fileName.trim || fileName.trim() === '') {
+      throw new Error('Insert a File path as string argument');
+    }
+
+    if ((0, _fs.existsSync)(fileName)) {
+      let fileContent = (0, _fs.readFileSync)(fileName);
+
+      return this.format(fileName, fileContent).content;
+    }
+
+    throw new Error(`The file ${ fileName } was not found!`);
+  }
+
+  getCSS() {
+    let config = arguments.length &gt; 0 &amp;&amp; arguments[0] !== undefined ? arguments[0] : {};
+
+    if (!this.content) {
+      throw new Error('Create a data-uri config using the method encodeSync');
+    }
+
+    config.class = config.class || _path2.default.basename(this.fileName, _path2.default.extname(this.fileName));
+    config.background = this.content;
+
+    if (config.width || config.height || config['background-size']) {
+      config.dimensions = (0, _imageSize2.default)(this.fileName);
+    }
+
+    return (0, _css2.default)(config);
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.datauri.css" id="apidoc.module.datauri.css">module datauri.css</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.datauri.css.default" id="apidoc.element.datauri.css.default">
+        function <span class="apidocSignatureSpan">datauri.css.</span>default
+        <span class="apidocSignatureSpan">(data)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">data =&gt; BASE_CSS(data).concat(SIZE(data), ['}']).join('\n')</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.datauri.uri" id="apidoc.module.datauri.uri">module datauri.uri</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.datauri.uri.default" id="apidoc.element.datauri.uri.default">
+        function <span class="apidocSignatureSpan">datauri.uri.</span>default
+        <span class="apidocSignatureSpan">{{signature}}</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">data =&gt; `data:${ data.mimetype };base64,${ data.base64 }`</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
