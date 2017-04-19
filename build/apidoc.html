@@ -63,6 +63,15 @@
 
         <li>
 
+            <a class="apidocElementLiA" href="#apidoc.element.datauri.datauri">
+            function <span class="apidocSignatureSpan"></span>datauri
+            <span class="apidocSignatureSpan">()</span>
+            </a>
+
+        </li>
+
+        <li>
+
             <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">datauri.</span>api</span>
 
         </li>
@@ -124,6 +133,53 @@
 
 <div class="apidocSectionDiv">
 <h1><a href="#apidoc.module.datauri" id="apidoc.module.datauri">module datauri</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.datauri.datauri" id="apidoc.element.datauri.datauri">
+        function <span class="apidocSignatureSpan"></span>datauri
+        <span class="apidocSignatureSpan">()</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">class DataURI extends _api2.default {
+
+  constructor() {
+    super();
+
+    for (var _len = arguments.length, config = Array(_len), _key = 0; _key &#x3c; _len; _key++) {
+      config[_key] = arguments[_key];
+    }
+
+    const configSize = config.length;
+
+
+    if (configSize) {
+      this[ENC_TYPE(configSize)].apply(this, config);
+    }
+  }
+
+  static promise(fileName) {
+    const datauri = new DataURI();
+
+    return new Promise((resolve, reject) =&#x3e; {
+      datauri.on(&#x27;encoded&#x27;, resolve).on(&#x27;error&#x27;, reject).encode(fileName);
+    });
+  }
+
+  static sync(fileName) {
+    var _ref = new DataURI(fileName);
+
+    const content = _ref.content;
+
+
+    return content;
+  }
+
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
 
 
 
